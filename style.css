@@ -1,0 +1,18 @@
+#topBar {
+    text-align: center;
+    background-color: aliceblue;
+}
+
+#currentTime {
+    text-align: center;
+    margin: 0 auto;
+    font-size: 100px;
+}
+
+#sideBar {
+    left:0;
+    padding-left: 10px;
+    width: 10%;
+    background-color: aliceblue;
+    position:fixed;
+}
