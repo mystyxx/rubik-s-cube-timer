@@ -12,7 +12,26 @@
 #sideBar {
     left:0;
     padding-left: 10px;
+    padding-bottom: 100%;
     width: 10%;
     background-color: aliceblue;
     position:fixed;
+}
+
+#timelist {
+    display: grid;
+    grid-column: 3;
+    outline-color: black;
+    margin-top: 20px;
+    row-gap: 20px;
+}
+
+#timelist>div>p {
+    /* margin: 0; */
+    display: inline;
+    padding: 10px;
+    
+    outline-width: 2px;
+    outline-color: black;
+    outline-style: solid;
 }

@@ -68,9 +68,36 @@ function timer() {
     console.log(testIsReady);
 }
 
-// function showTimes(timesIndex) {
-//     for(let i = 0; i>times[timesIndex])
-// }
+function updateTimes() {
+    const timeList = document.getElementById("timeList");
+    timeList.innerHTML = ""; // Efface tout le contenu actuel de timeList
+
+    const sessionIndex = parseInt(sessionSelect.value) - 1;
+    const sessionTimes = times[sessionIndex];
+
+    for (let i = 0; i < sessionTimes.length; i++) {
+        const time = sessionTimes[i];
+        const timeDiv = document.createElement('div');
+        timeDiv.innerHTML = `<p style="
+        grid-column: 1;
+        display: inline;
+        padding: 10px;
+        outline-width: 2px;
+        outline-color: black;
+        outline-style: solid;">${i + 1}</p>
+
+        <p style="
+        grid-column: 2;
+        display: inline;
+        padding: 10px;
+        outline-width: 2px;
+        outline-color: black;
+        outline-style: solid;">${time}</p>`;
+        timeList.appendChild(timeDiv);
+    }
+}
+
+
 
 //add selection option for the current session
 for(let i = 1; i<=times.length; i++) {
@@ -79,14 +106,16 @@ for(let i = 1; i<=times.length; i++) {
 }
 sessionSelect.value = times.length.toString();
 
+updateTimes()
+
 document.getElementById("sessionSelect").addEventListener("change", (createNewSession) => {
-    console.log(createNewSession.target.value)
     if (createNewSession.target.value === "new session") {
         times.push([]);
         localStorage.setItem("times", JSON.stringify(times));
         sessionSelect.appendChild(create(`<option value=${times.length}>${times.length}</option>`));
         sessionSelect.value = times.length.toString();
     }
+    updateTimes()
 });
 
 addEventListener("keydown", (timerReady) => {
@@ -100,7 +129,7 @@ addEventListener("keydown", (timerReady) => {
             times[sessionSelect.options[sessionSelect.selectedIndex].value-1].push(document.getElementById("currentTime").innerText);
             localStorage.setItem("times", JSON.stringify(times));
             document.getElementById("scramble").innerText = scramble(20);
-            // alert(JSON.stringify(times)); // Afficher les temps enregistrés
+            updateTimes() // Afficher les temps enregistrés
         }
         a += 1;
         if (a >= 15) {
