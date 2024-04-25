@@ -68,14 +68,28 @@ function timer() {
     console.log(testIsReady);
 }
 
+function ao5(index) {
+    let s = 0;
+    // let currentSession = parseInt(times[sessionSelect.value-1]);
+    try {
+        for(let i = index-1; i>index-6; i--) {
+            s+= parseFloat(times[sessionSelect.value-1][times[sessionSelect.value-1].length-1-i]);
+        }
+    }
+    catch(error) {
+        return("--");
+    }
+    return(Math.round(s/5 * 100) / 100);
+}
+
 function updateTimes() {
     const timeList = document.getElementById("timeList");
-    timeList.innerHTML = ""; // Efface tout le contenu actuel de timeList
+    timeList.innerHTML = ""; // erase timelist entierly
 
     const sessionIndex = parseInt(sessionSelect.value) - 1;
     const sessionTimes = times[sessionIndex];
 
-    for (let i = 0; i < sessionTimes.length; i++) {
+    for (let i = sessionTimes.length-1; i >= 0; i--) {
         const time = sessionTimes[i];
         const timeDiv = document.createElement('div');
         timeDiv.innerHTML = `<p style="
@@ -92,11 +106,21 @@ function updateTimes() {
         padding: 10px;
         outline-width: 2px;
         outline-color: black;
-        outline-style: solid;">${time}</p>`;
+        outline-style: solid;">${time}</p>
+        
+        <p style="
+        grid-column: 2;
+        display: inline;
+        padding: 10px;
+        outline-width: 2px;
+        outline-color: black;
+        outline-style: solid;">${ao5(i+1)}</p>`;
         timeList.appendChild(timeDiv);
-    }
-}
 
+    }
+    // average calculations
+    document.getElementById("ao5").innerText = `current ao5 : ${ao5()}`;
+}
 
 
 //add selection option for the current session
