@@ -65,21 +65,40 @@ function scramble(length) {
 function timer() {
     let ms = parseFloat(document.getElementById("currentTime").innerText) + 0.01;
     document.getElementById("currentTime").innerText = Math.round(ms * 100) / 100;
-    console.log(testIsReady);
 }
 
 function ao5(index) {
     let s = 0;
-    // let currentSession = parseInt(times[sessionSelect.value-1]);
-    try {
-        for(let i = index-1; i>index-6; i--) {
-            s+= parseFloat(times[sessionSelect.value-1][times[sessionSelect.value-1].length-1-i]);
-        }
+    const sessionIndex = parseInt(sessionSelect.value) - 1;
+    const sessionTimes = times[sessionIndex];
+
+    // check there are at leat 5 times
+    if (index < 5 || index > sessionTimes.length) {
+        return "--";
     }
-    catch(error) {
-        return("--");
+
+    // calculate average of 5 (`index` element included)
+    const startIndex = Math.max(0, index - 5); // start of the 5 times frame
+    const endIndex = index - 1; // end of the 5 times frame
+
+    for (let i = endIndex; i >= startIndex; i--) {
+        s += parseFloat(sessionTimes[i]);
     }
-    return(Math.round(s/5 * 100) / 100);
+
+    return Math.round((s / Math.min(5, endIndex - startIndex + 1)) * 100) / 100;
+}
+
+
+function globalAverage() {
+    let s = 0;
+    const sessionIndex = parseInt(sessionSelect.value) - 1;
+    const sessionTimes = times[sessionIndex];
+
+    for (let i = 0; i < sessionTimes.length; i++) {
+        s += parseFloat(sessionTimes[i]);
+    }
+
+    return Math.round((s / sessionTimes.length) * 100) / 100;
 }
 
 function updateTimes() {
@@ -119,7 +138,8 @@ function updateTimes() {
 
     }
     // average calculations
-    document.getElementById("ao5").innerText = `current ao5 : ${ao5()}`;
+    document.querySelector("#ao5").innerText = `current ao5 : ${ao5(sessionTimes.length)}`;
+    document.querySelector("#average").innerText = `average : ${globalAverage()}`;
 }
 
 
