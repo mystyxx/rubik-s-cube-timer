@@ -101,6 +101,17 @@ function globalAverage() {
     return Math.round((s / sessionTimes.length) * 100) / 100;
 }
 
+function pb() {
+    let sessionTimes = times[parseInt(sessionSelect.value) - 1];
+    let pb = sessionTimes[0];
+    for(let i= sessionTimes.length-1; i>=0; i--) {
+        if(pb>parseFloat(sessionTimes[i])) {
+            pb = parseFloat(sessionTimes[i]);
+        }
+    }
+    return(pb);
+}
+
 function updateTimes() {
     const timeList = document.getElementById("timeList");
     timeList.innerHTML = ""; // erase timelist entierly
@@ -140,6 +151,8 @@ function updateTimes() {
     // average calculations
     document.querySelector("#ao5").innerText = `current ao5 : ${ao5(sessionTimes.length)}`;
     document.querySelector("#average").innerText = `average : ${globalAverage()}`;
+
+    document.getElementById("pb").innerText = `session best best : ${pb()}`
 }
 
 
@@ -173,7 +186,12 @@ addEventListener("keydown", (timerReady) => {
             times[sessionSelect.options[sessionSelect.selectedIndex].value-1].push(document.getElementById("currentTime").innerText);
             localStorage.setItem("times", JSON.stringify(times));
             document.getElementById("scramble").innerText = scramble(20);
-            updateTimes() // Afficher les temps enregistrés
+            updateTimes()
+
+            if(document.getElementById("currentTime").innerText==pb()) {
+                document.getElementById("currentTime").style.textDecoration = 'underline';
+            }
+            else{document.getElementById("currentTime").style.textDecoration = 'none'}
         }
         a += 1;
         if (a >= 15) {
