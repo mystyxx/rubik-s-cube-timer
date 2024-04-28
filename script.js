@@ -44,23 +44,53 @@ function scramble(length) {
 
     let sequence = [];
     let lastSide = ''; // last side turned
+    let lastOppositeCount = 0; 
 
     for (let i = 0; i < length; i++) {
         let side;
         do {
             side = moves[Math.floor(Math.random() * moves.length)]; // randomly picking a side
-        } while (side === lastSide); // check if the last side was picked last time
+        } while (side === lastSide || // Check if the new side is the same as the last side
+        side === oppositeSide(lastSide) || // Check if the new side is opposite to the last side
+        (lastOppositeCount >= 2 && side === moves[Math.floor(Math.random() * moves.length)]) // Avoid repeating opposite sides too many times
+        ); // check if the last side was picked last time
 
         const turn = turns[Math.floor(Math.random() * turns.length)]; // randomly picking the rotation
         const move = side + turn; // combining side and rotation
 
         sequence.push(move);
-        lastSide = side; // update last Side
+
+        // Update last opposite count
+        if (side === oppositeSide(lastSide)) {
+            lastOppositeCount++;
+        } else {
+            lastOppositeCount = 0;
+        }
+
+        lastSide = side; // update last side
     }
 
     return sequence.join(' ');
 }
 
+function oppositeSide(side) {
+    switch (side) {
+        case 'F':
+            return 'B';
+        case 'B':
+            return 'F';
+        case 'R':
+            return 'L';
+        case 'L':
+            return 'R';
+        case 'U':
+            return 'D';
+        case 'D':
+            return 'U';
+        default:
+            return ''; 
+    }
+}
 
 function timer() {
     let ms = parseFloat(document.getElementById("currentTime").innerText) + 0.01;
