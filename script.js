@@ -97,39 +97,27 @@ function timer() {
     document.getElementById("currentTime").innerText = Math.round(ms * 100) / 100;
 }
 
-function ao5(index) {
+function ao(x, index) {
     let s = 0;
     const sessionIndex = parseInt(sessionSelect.value) - 1;
     const sessionTimes = times[sessionIndex];
 
-    // check there are at leat 5 times
-    if (index < 5 || index > sessionTimes.length) {
+    // check there are at leat x times
+    if (index < x || index > sessionTimes.length) {
         return "--";
     }
 
-    // calculate average of 5 (`index` element included)
-    const startIndex = Math.max(0, index - 5); // start of the 5 times frame
-    const endIndex = index - 1; // end of the 5 times frame
+    // calculate average of x (`index` element included)
+    const startIndex = Math.max(0, index - x); // start of the x times frame
+    const endIndex = index - 1; // end of the x times frame
 
     for (let i = endIndex; i >= startIndex; i--) {
         s += parseFloat(sessionTimes[i]);
     }
 
-    return Math.round((s / Math.min(5, endIndex - startIndex + 1)) * 100) / 100;
+    return Math.round((s / Math.min(x, endIndex - startIndex + 1)) * 100) / 100;
 }
 
-
-function globalAverage() {
-    let s = 0;
-    const sessionIndex = parseInt(sessionSelect.value) - 1;
-    const sessionTimes = times[sessionIndex];
-
-    for (let i = 0; i < sessionTimes.length; i++) {
-        s += parseFloat(sessionTimes[i]);
-    }
-
-    return Math.round((s / sessionTimes.length) * 100) / 100;
-}
 
 function pb() {
     let sessionTimes = times[parseInt(sessionSelect.value) - 1];
@@ -174,13 +162,14 @@ function updateTimes() {
         padding: 10px;
         outline-width: 2px;
         outline-color: black;
-        outline-style: solid;">${ao5(i+1)}</p>`;
+        outline-style: solid;">${ao(5, i+1)}</p>`;
         timeList.appendChild(timeDiv);
 
     }
     // average calculations
-    document.querySelector("#ao5").innerText = `current ao5 : ${ao5(sessionTimes.length)}`;
-    document.querySelector("#average").innerText = `average : ${globalAverage()}`;
+    document.querySelector("#ao5").innerText = `current ao5 : ${ao(5, sessionTimes.length)}`;
+    document.getElementById("ao12").innerText = ` current ao12 : ${ao(12, sessionTimes.length)}`;
+    document.querySelector("#average").innerText = `average : ${ao(sessionTimes.length, sessionTimes.length)}`;
 
     document.getElementById("pb").innerText = `session best best : ${pb()}`
 }
