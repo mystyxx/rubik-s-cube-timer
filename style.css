@@ -42,3 +42,12 @@
     outline-color: black;
     outline-style: solid;
 }
+
+.timeGrid {
+    grid-column: 1;
+    display: inline;
+    padding: 10px;
+    outline-width: 2px;
+    outline-color: black;
+    outline-style: solid;
+}

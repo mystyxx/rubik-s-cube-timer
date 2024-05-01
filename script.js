@@ -130,7 +130,15 @@ function pb() {
     return(pb);
 }
 
+function deleteTime(i) {
+    if(confirm(`are you sure you want to delete your ${times[parseInt(sessionSelect.value)-1][i]} solve ?`)){
+        times[parseInt(sessionSelect.value)-1].splice(i, 1);
+        updateTimes();
+    }
+}
+
 function updateTimes() {
+    localStorage.setItem("times", JSON.stringify(times));
     const timeList = document.getElementById("timeList");
     timeList.innerHTML = ""; // erase timelist entierly
 
@@ -140,29 +148,11 @@ function updateTimes() {
     for (let i = sessionTimes.length-1; i >= 0; i--) {
         const time = sessionTimes[i];
         const timeDiv = document.createElement('div');
-        timeDiv.innerHTML = `<p style="
-        grid-column: 1;
-        display: inline;
-        padding: 10px;
-        outline-width: 2px;
-        outline-color: black;
-        outline-style: solid;">${i + 1}</p>
+        timeDiv.innerHTML = `<p class="timeGrid">${i + 1}</p>
 
-        <p style="
-        grid-column: 2;
-        display: inline;
-        padding: 10px;
-        outline-width: 2px;
-        outline-color: black;
-        outline-style: solid;">${time}</p>
+        <p class="timeGrid" ondblclick='deleteTime(${i})'>${time}</p>
         
-        <p style="
-        grid-column: 2;
-        display: inline;
-        padding: 10px;
-        outline-width: 2px;
-        outline-color: black;
-        outline-style: solid;">${ao(5, i+1)}</p>`;
+        <p class="timeGrid">${ao(5, i+1)}</p>`;
         timeList.appendChild(timeDiv);
 
     }
@@ -203,7 +193,6 @@ addEventListener("keydown", (timerReady) => {
             
             // add current times to global times list
             times[sessionSelect.options[sessionSelect.selectedIndex].value-1].push(document.getElementById("currentTime").innerText);
-            localStorage.setItem("times", JSON.stringify(times));
             document.getElementById("scramble").innerText = scramble(20);
             updateTimes()
 
