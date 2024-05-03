@@ -107,12 +107,26 @@ function ao(x, index) {
         return "--";
     }
 
-    // calculate average of x (`index` element included)
     const startIndex = Math.max(0, index - x); // start of the x times frame
     const endIndex = index - 1; // end of the x times frame
 
+    // find the biggest and the smallest values
+    let minTime = -Infinity;
+    let maxTime = Infinity;
+    for(let i = startIndex; i<=endIndex; i++) {
+        let currentTime = parseFloat(sessionTimes[i]);
+        if (currentTime < minTime) {
+            minTime = currentTime;
+        }
+        if (currentTime > maxTime) {
+            maxTime = currentTime;
+        }
+    }
+
     for (let i = endIndex; i >= startIndex; i--) {
-        s += parseFloat(sessionTimes[i]);
+        if(parseFloat(sessionTimes[i])!==maxTime && parseFloat(sessionTimes[i])!==minTime) {
+            s += parseFloat(sessionTimes[i]);
+        }
     }
 
     return Math.round((s / Math.min(x, endIndex - startIndex + 1)) * 100) / 100;
