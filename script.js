@@ -161,12 +161,11 @@ function updateTimes() {
 
     for (let i = sessionTimes.length-1; i >= 0; i--) {
         const time = sessionTimes[i];
-        const timeDiv = document.createElement('div');
-        timeDiv.innerHTML = `<p class="timeGrid">${i + 1}</p>
-
-        <p class="timeGrid" ondblclick='deleteTime(${i})'>${time}</p>
-        
-        <p class="timeGrid">${ao(5, i+1)}</p>`;
+        const timeDiv = document.createElement('tr');
+        timeDiv.innerHTML = `
+            <td class="timeGrid">${i + 1}</td>
+            <td class="timeGrid" ondblclick='deleteTime(${i})'>${time}</td>
+            <td class="timeGrid">${ao(5, i+1)}</td>`;
         timeList.appendChild(timeDiv);
 
     }
@@ -225,6 +224,7 @@ addEventListener("keydown", (timerReady) => {
 });
 
 addEventListener("keyup", (timerStart) => {
+    if(localStorage.getItem("inputMethod")==='')
     if (timerStart.keyCode == 32) {
         a = 0;
         document.getElementById("currentTime").style.color = 'black';
