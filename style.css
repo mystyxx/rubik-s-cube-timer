@@ -7,7 +7,16 @@ body {
     background-color: aliceblue;
 }
 
+#manualInput {
+    display: none;
+    text-align: center;
+    font-size: 100px;
+    margin-left: 25%;
+    max-width: 50%;
+}
+
 #currentTime {
+    display: block;
     text-align: center;
     margin: 0 auto;
     font-size: 100px;
@@ -43,4 +52,10 @@ td {
 #timeList, th, td {
     border: 1px solid black;
     border-collapse: collapse;
+}
+
+#switchInputMethod {
+    right: 0;
+    bottom: 0;
+    position: absolute;
 }

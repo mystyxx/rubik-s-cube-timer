@@ -12,6 +12,7 @@
     </div>
 
     <h1 id="currentTime">0.00</h1>
+    <input id="manualInput" type="text" onkeypress="submitTime(event)">
 
     <h2 id="ao5"></h2>
     <h2 id="ao12"></h2>
@@ -25,6 +26,8 @@
         <p id="pb">session best single : --</p>
         <table id="timeList"><table>
     </div>
+
+    <button id="switchInputMethod" onclick="switchInputMethod()">switch input method</button>
         
         <script src="script.js"></script>    
 </body>

@@ -38,6 +38,21 @@ function create(htmlStr) {
     return frag;
 }
 
+function switchInputMethod() {
+    let inputMethod = localStorage.getItem("inputMethod");
+    console.log(inputMethod)
+    if(inputMethod === "manual") {
+        localStorage.setItem("inputMethod", "automatic");
+        document.getElementById("manualInput").style.display = 'none';
+        document.getElementById("currentTime").style.display = 'block';
+    }
+    if(inputMethod === 'automatic') {
+        localStorage.setItem("inputMethod", "manual");
+        document.getElementById("manualInput").style.display = 'block';
+        document.getElementById("currentTime").style.display = 'none';
+    }
+}
+
 function scramble(length) {
     const moves = ['F', 'B', 'R', 'L', 'U', 'D']; // Rubik's cube sides
     const turns = ['', "'", '2']; // types of rotation
@@ -144,6 +159,22 @@ function pb() {
     return(pb);
 }
 
+function submitTime(event) {
+    if(localStorage.getItem("inputMethod") === "manual") {
+        if(event.key !== "Enter") {
+            return;
+        }
+    }
+    // add current times to global times list
+
+    if(!isNaN(parseFloat(document.getElementById("manualInput").value))) {
+        times[sessionSelect.options[sessionSelect.selectedIndex].value-1].push(Math.abs(document.getElementById("manualInput").value));
+        document.getElementById("scramble").innerText = scramble(20);
+    }
+    document.getElementById("manualInput").value = '';
+    updateTimes()
+}
+
 function deleteTime(i) {
     if(confirm(`are you sure you want to delete your ${times[parseInt(sessionSelect.value)-1][i]} solve ?`)){
         times[parseInt(sessionSelect.value)-1].splice(i, 1);
@@ -204,10 +235,7 @@ addEventListener("keydown", (timerReady) => {
             clearInterval(timerIntervalId);
             testIsRunning = false;
             
-            // add current times to global times list
-            times[sessionSelect.options[sessionSelect.selectedIndex].value-1].push(document.getElementById("currentTime").innerText);
-            document.getElementById("scramble").innerText = scramble(20);
-            updateTimes()
+            submitTime();
 
             if(document.getElementById("currentTime").innerText==pb()) {
                 document.getElementById("currentTime").style.textDecoration = 'underline';
