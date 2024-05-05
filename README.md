@@ -2,7 +2,6 @@
 a tool for practicing 3x3x3 rubik's cube, by mystyxx
 
 ## incoming features  
-- manual time input
 - export times
 - prettier UI (i promise)
 - graph
