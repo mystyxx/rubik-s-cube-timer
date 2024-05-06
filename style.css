@@ -1,7 +1,8 @@
-body {
-    overflow-y: hidden;
+html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
 }
-
 #topBar {
     text-align: center;
     background-color: aliceblue;
@@ -34,14 +35,15 @@ body {
     padding-right: 10px;
     width:fit-content;
     background-color: aliceblue;
-
+    height:max-content;
+    top: 20%;
+    border: 1px solid black;
+    border-collapse: collapse;
 }
 
 #timeList {
-    margin-top: 20px;
     row-gap: 20px;
-    max-height: 900px;
-    overflow-y: scroll;
+    display: block;
 }
 
 td {
@@ -58,4 +60,9 @@ td {
     right: 0;
     bottom: 0;
     position: absolute;
+}
+
+.scroll {
+    max-height: 55vh;
+    overflow-y: scroll;
 }
