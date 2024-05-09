@@ -208,6 +208,21 @@ function updateTimes() {
     document.getElementById("pb").innerText = `session best best : ${pb()}`
 }
 
+function exportTimes(timenb) {
+    let exportstr = '';
+
+    if(timenb >= 5) {exportstr += `moyenne élaguée sur 5 : ${ao(5, times[parseInt(sessionSelect.value)-1].length)}\n\n`}
+
+    if(timenb >=12) {exportstr += `moyenne élaguée sur 12 : ${ao(12, times[parseInt(sessionSelect.value)-1].length)}\n\n`}
+
+    if(timenb >= 100) {exportstr+=`moyenne élaguée sur 100 : ${ao(100, times[parseInt(sessionSelect.value)-1],length)}`}
+
+    for(let i = 0; i<timenb; i++) {
+        exportstr += `${i+1}. ${times[parseInt(sessionSelect.value)-1][i]}\n`;
+    }
+
+    return exportstr;
+}
 
 //add selection option for the current session
 for(let i = 1; i<=times.length; i++) {
