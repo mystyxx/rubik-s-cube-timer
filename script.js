@@ -209,6 +209,9 @@ function submitTime(event) {
             return;
         }
     }
+    else {
+        times[sessionSelect.options[sessionSelect.selectedIndex].value-1].push(new solve(parseFloat(document.getElementById("currentTime").innerText), document.getElementById("scramble").innerText));
+    }
     // add current times to global times list
 
     if(!isNaN(parseFloat(document.getElementById("manualInput").value))) {
@@ -238,7 +241,7 @@ function updateTimes() {
         const time = sessionTimes[i].time;
         const timeDiv = document.createElement('tr');
         timeDiv.innerHTML = `
-            <td class="timeGrid">${i + 1}</td>
+            <td class="timeGrid">${i + 1}.</td>
             <td class="timeGrid" ondblclick='deleteTime(${i})'>${time}</td>
             <td class="timeGrid">${ao(5, i+1)}</td>`;
         timeList.appendChild(timeDiv);
