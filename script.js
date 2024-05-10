@@ -27,6 +27,37 @@ let timerIntervalId;
 let sessionSelect = document.getElementById("sessionSelect");
 document.getElementById("scramble").innerText = scramble(20);
 
+class solve {
+    constructor(time, scramble) {
+        this.time = time;
+        this.scramble = scramble;
+        this.ao5 = ao(5, times[parseInt(sessionSelect.value)-1].length);
+        this.ao12 = ao(12, times[parseInt(sessionSelect.value)-1].length);
+        this.ao50 = ao(50, times[parseInt(sessionSelect.value)-1].length);
+        this.ao100 = ao(100, times[parseInt(sessionSelect.value)-1].length);
+        this.ao1000 = ao(1000, times[parseInt(sessionSelect.value)-1].length);
+    }
+}
+
+function quicksort(liste) {
+    if(liste.length==1 || liste.length==0) {
+        return liste
+    }
+    else{
+        pivot = liste[0]    
+        let listegauche = [];
+        let listedroite = [];
+        for(let i = 1; i<liste.length; i++) {
+            if(liste[i] < pivot) {
+                 listegauche.push(liste[i]);
+            }
+            else{
+                 listedroite.push(liste[i]);
+            }
+        }
+        return [...quicksort(listegauche).concat([pivot], ...quicksort(listedroite))]
+    }
+}
 
 function create(htmlStr) {
     var frag = document.createDocumentFragment(),
@@ -129,7 +160,7 @@ function ao(x, index) {
     let minTime = -Infinity;
     let maxTime = Infinity;
     for(let i = startIndex; i<=endIndex; i++) {
-        let currentTime = parseFloat(sessionTimes[i]);
+        let currentTime = parseFloat(sessionTimes[i].time);
         if (currentTime < minTime) {
             minTime = currentTime;
         }
@@ -139,8 +170,8 @@ function ao(x, index) {
     }
 
     for (let i = endIndex; i >= startIndex; i--) {
-        if(parseFloat(sessionTimes[i])!==maxTime && parseFloat(sessionTimes[i])!==minTime) {
-            s += parseFloat(sessionTimes[i]);
+        if(parseFloat(sessionTimes[i].time)!==maxTime && parseFloat(sessionTimes[i].time)!==minTime) {
+            s += parseFloat(sessionTimes[i].time);
         }
     }
 
@@ -150,10 +181,10 @@ function ao(x, index) {
 
 function pb() {
     let sessionTimes = times[parseInt(sessionSelect.value) - 1];
-    let pb = sessionTimes[0];
+    let pb = sessionTimes[0].time;
     for(let i= sessionTimes.length-1; i>=0; i--) {
-        if(pb>parseFloat(sessionTimes[i])) {
-            pb = parseFloat(sessionTimes[i]);
+        if(pb>parseFloat(sessionTimes[i].time)) {
+            pb = parseFloat(sessionTimes[i].time);
         }
     }
     return(pb);
@@ -168,7 +199,7 @@ function submitTime(event) {
     // add current times to global times list
 
     if(!isNaN(parseFloat(document.getElementById("manualInput").value))) {
-        times[sessionSelect.options[sessionSelect.selectedIndex].value-1].push(Math.abs(document.getElementById("manualInput").value));
+        times[sessionSelect.options[sessionSelect.selectedIndex].value-1].push(new solve(Math.abs(document.getElementById("manualInput").value), document.getElementById("scramble").innerText));
         document.getElementById("scramble").innerText = scramble(20);
     }
     document.getElementById("manualInput").value = '';
@@ -176,7 +207,7 @@ function submitTime(event) {
 }
 
 function deleteTime(i) {
-    if(confirm(`are you sure you want to delete your ${times[parseInt(sessionSelect.value)-1][i]} solve ?`)){
+    if(confirm(`are you sure you want to delete your ${times[parseInt(sessionSelect.value)-1][i].time} solve ?`)){
         times[parseInt(sessionSelect.value)-1].splice(i, 1);
         updateTimes();
     }
@@ -191,7 +222,7 @@ function updateTimes() {
     const sessionTimes = times[sessionIndex];
 
     for (let i = sessionTimes.length-1; i >= 0; i--) {
-        const time = sessionTimes[i];
+        const time = sessionTimes[i].time;
         const timeDiv = document.createElement('tr');
         timeDiv.innerHTML = `
             <td class="timeGrid">${i + 1}</td>
@@ -205,7 +236,7 @@ function updateTimes() {
     document.getElementById("ao12").innerText = ` current ao12 : ${ao(12, sessionTimes.length)}`;
     document.querySelector("#average").innerText = `average : ${ao(sessionTimes.length, sessionTimes.length)}`;
 
-    document.getElementById("pb").innerText = `session best best : ${pb()}`
+    document.getElementById("pb").innerText = `session best single : ${pb()}`
 }
 
 function exportTimes(timenb) {
@@ -215,10 +246,10 @@ function exportTimes(timenb) {
 
     if(timenb >=12) {exportstr += `moyenne élaguée sur 12 : ${ao(12, times[parseInt(sessionSelect.value)-1].length)}\n\n`}
 
-    if(timenb >= 100) {exportstr+=`moyenne élaguée sur 100 : ${ao(100, times[parseInt(sessionSelect.value)-1],length)}`}
+    if(timenb >= 100) {exportstr+=`moyenne élaguée sur 100 : ${ao(100, times[parseInt(sessionSelect.value)-1].length)}`}
 
     for(let i = 0; i<timenb; i++) {
-        exportstr += `${i+1}. ${times[parseInt(sessionSelect.value)-1][i]}\n`;
+        exportstr += `${i+1}.(${times[parseInt(sessionSelect.value)-1][i].time}) ${times[parseInt(sessionSelect.value)-1][i].scramble}\n`;
     }
 
     return exportstr;
@@ -232,6 +263,16 @@ for(let i = 1; i<=times.length; i++) {
 sessionSelect.value = times.length.toString();
 
 updateTimes()
+
+if(localStorage.getItem("inputMethod")==='manual') {
+    document.getElementById("manualInput").style.display = 'block';
+    document.getElementById("currentTime").style.display = 'none';
+}
+else {
+    document.getElementById("manualInput").style.display = 'none';
+    document.getElementById("currentTime").style.display = 'block';
+}
+
 
 document.getElementById("sessionSelect").addEventListener("change", (createNewSession) => {
     if (createNewSession.target.value === "new session") {
@@ -267,15 +308,16 @@ addEventListener("keydown", (timerReady) => {
 });
 
 addEventListener("keyup", (timerStart) => {
-    if(localStorage.getItem("inputMethod")==='')
-    if (timerStart.keyCode == 32) {
-        a = 0;
-        document.getElementById("currentTime").style.color = 'black';
-        if (testIsReady) {
-            document.getElementById("currentTime").innerText = '0';
-            testIsReady = false;
-            testIsRunning = true;
-            timerIntervalId = setInterval(timer, 10);
+    if(localStorage.getItem("inputMethod")==='automatic') {
+        if (timerStart.keyCode == 32) {
+            a = 0;
+            document.getElementById("currentTime").style.color = 'black';
+            if (testIsReady) {
+                document.getElementById("currentTime").innerText = '0';
+                testIsReady = false;
+                testIsRunning = true;
+                timerIntervalId = setInterval(timer, 10);
+            }
         }
     }
 });
