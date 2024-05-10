@@ -190,6 +190,19 @@ function pb() {
     return(pb);
 }
 
+function pbao(x) {
+    let sessionTimes = times[parseInt(sessionSelect.value) - 1];
+    let pb = ao(x, x)
+
+    for(let i = x; i<sessionTimes.length+1; i++) {
+        console.log(i)
+        if(pb>ao(x, i)) {
+            pb = ao(x, i);
+        }
+    }
+    return pb;
+}
+
 function submitTime(event) {
     if(localStorage.getItem("inputMethod") === "manual") {
         if(event.key !== "Enter") {
@@ -240,13 +253,19 @@ function updateTimes() {
 }
 
 function exportTimes(timenb) {
-    let exportstr = '';
+    let exportstr = `meilleur single : ${pb()}\n`;
 
-    if(timenb >= 5) {exportstr += `moyenne élaguée sur 5 : ${ao(5, times[parseInt(sessionSelect.value)-1].length)}\n\n`}
+    if(timenb >= 5) {exportstr += `moyenne élaguée sur 5 :
+    en cours : ${ao(5, times[parseInt(sessionSelect.value)-1].length)}
+    meilleure : ${pbao(5)}\n`}
 
-    if(timenb >=12) {exportstr += `moyenne élaguée sur 12 : ${ao(12, times[parseInt(sessionSelect.value)-1].length)}\n\n`}
+    if(timenb >=12) {exportstr += `moyenne élaguée sur 12 :
+    en cours : ${ao(12, times[parseInt(sessionSelect.value)-1].length)}
+    meilleure : ${pbao(12)}\n`}
 
-    if(timenb >= 100) {exportstr+=`moyenne élaguée sur 100 : ${ao(100, times[parseInt(sessionSelect.value)-1].length)}`}
+    if(timenb >= 100) {exportstr+=`moyenne élaguée sur 100 :
+    en cours :${ao(100, times[parseInt(sessionSelect.value)-1].length)}
+    meilleure : ${pbao(100)}\n`}
 
     for(let i = 0; i<timenb; i++) {
         exportstr += `${i+1}.(${times[parseInt(sessionSelect.value)-1][i].time}) ${times[parseInt(sessionSelect.value)-1][i].scramble}\n`;
