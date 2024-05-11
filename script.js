@@ -27,6 +27,10 @@ let timerIntervalId;
 let sessionSelect = document.getElementById("sessionSelect");
 document.getElementById("scramble").innerText = scramble(20);
 
+if(!localStorage.getItem("inputMethod")) {
+    localStorage.setItem("inputMethod", "automatic")
+}
+
 class solve {
     constructor(time, scramble) {
         this.time = time;
@@ -230,6 +234,7 @@ function deleteTime(i) {
 }
 
 function updateTimes() {
+    if(times[parseInt(sessionSelect.value)-1][0] == undefined) {return;}
     localStorage.setItem("times", JSON.stringify(times));
     const timeList = document.getElementById("timeList");
     timeList.innerHTML = ""; // erase timelist entierly
@@ -242,21 +247,23 @@ function updateTimes() {
         const timeDiv = document.createElement('tr');
         timeDiv.innerHTML = `
             <td class="timeGrid">${i + 1}.</td>
-            <td class="timeGrid" ondblclick='deleteTime(${i})'>${time}</td>
-            <td class="timeGrid">${ao(5, i+1)}</td>`;
+            <td class="timeGrid" ondblclick='deleteTime(${i})' onclick='alert(exportTimes(${i}, ${i}, true))'>${time}</td>
+            <td class="timeGrid">${sessionTimes[i].ao5}</td>`;
         timeList.appendChild(timeDiv);
 
     }
     // average calculations
-    document.querySelector("#ao5").innerText = `current ao5 : ${ao(5, sessionTimes.length)}`;
-    document.getElementById("ao12").innerText = ` current ao12 : ${ao(12, sessionTimes.length)}`;
+    document.querySelector("#ao5").innerText = `current ao5 : ${sessionTimes[i].ao5}`;
+    document.getElementById("ao12").innerText = ` current ao12 : ${sessionTimes[i].ao12}`;
     document.querySelector("#average").innerText = `average : ${ao(sessionTimes.length, sessionTimes.length)}`;
 
     document.getElementById("pb").innerText = `session best single : ${pb()}`
 }
 
-function exportTimes(timenb) {
-    let exportstr = `meilleur single : ${pb()}\n`;
+function exportTimes(startIndex, endIndex, single) {
+    let exportstr = '';
+    if(!single) {exportstr = `meilleur single : ${pb()}\n`;}
+    timenb = endIndex-startIndex;
 
     if(timenb >= 5) {exportstr += `moyenne élaguée sur 5 :
     en cours : ${ao(5, times[parseInt(sessionSelect.value)-1].length)}
@@ -270,9 +277,10 @@ function exportTimes(timenb) {
     en cours :${ao(100, times[parseInt(sessionSelect.value)-1].length)}
     meilleure : ${pbao(100)}\n`}
 
-    for(let i = 0; i<timenb; i++) {
+    for(let i = startIndex; i<=endIndex; i++) {
         exportstr += `${i+1}.(${times[parseInt(sessionSelect.value)-1][i].time}) ${times[parseInt(sessionSelect.value)-1][i].scramble}\n`;
     }
+
 
     return exportstr;
 }
