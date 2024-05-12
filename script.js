@@ -246,16 +246,16 @@ function updateTimes() {
         const time = sessionTimes[i].time;
         const timeDiv = document.createElement('tr');
         timeDiv.innerHTML = `
-            <td class="timeGrid">${i + 1}.</td>
-            <td class="timeGrid" ondblclick='deleteTime(${i})' onclick='alert(exportTimes(${i}, ${i}, true))'>${time}</td>
+            <td class="timeGrid" onclick='deleteTime(${i})'>${i + 1}.</td>
+            <td class="timeGrid" onclick='alert(exportTimes(${i}, ${i}, true))'>${time}</td>
             <td class="timeGrid">${sessionTimes[i].ao5}</td>`;
         timeList.appendChild(timeDiv);
 
     }
     // average calculations
-    document.querySelector("#ao5").innerText = `current ao5 : ${sessionTimes[i].ao5}`;
-    document.getElementById("ao12").innerText = ` current ao12 : ${sessionTimes[i].ao12}`;
-    document.querySelector("#average").innerText = `average : ${ao(sessionTimes.length, sessionTimes.length)}`;
+    document.getElementById("ao5").innerText = `current ao5 : ${sessionTimes[sessionTimes.length-1].ao5}`;
+    document.getElementById("ao12").innerText = ` current ao12 : ${sessionTimes[sessionTimes.length-1].ao12}`;
+    document.getElementById("average").innerText = `average : ${ao(sessionTimes.length, sessionTimes.length)}`;
 
     document.getElementById("pb").innerText = `session best single : ${pb()}`
 }
