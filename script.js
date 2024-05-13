@@ -24,7 +24,7 @@ let a = 0;
 let testIsReady = false;
 let testIsRunning = false;
 let timerIntervalId;
-let sessionSelect = document.getElementById("sessionSelect");
+let sessionSelect = document.getElementById("sessionSelect");   
 document.getElementById("scramble").innerText = scramble(20);
 
 if(!localStorage.getItem("inputMethod")) {
@@ -186,6 +186,7 @@ function ao(x, index) {
 
 function pb(startIndex, endIndex) {
     let sessionTimes = times[parseInt(sessionSelect.value) - 1];
+    if(sessionTimes.length == 0) {return '--'}
     let pb = sessionTimes[0].time;
     for(let i= endIndex; i>=startIndex; i--) {
         if(pb>parseFloat(sessionTimes[i].time)) {
@@ -251,11 +252,14 @@ function updateTimes() {
 
     }
     // average calculations
-    document.getElementById("ao5").innerText = `current ao5 : ${sessionTimes[sessionTimes.length-1].ao5}`;
-    document.getElementById("ao12").innerText = ` current ao12 : ${sessionTimes[sessionTimes.length-1].ao12}`;
-    document.getElementById("average").innerText = `average : ${ao(sessionTimes.length, sessionTimes.length)}`;
+    if(sessionTimes.length>0) {
+        document.getElementById("ao5").innerText = `current ao5 : ${sessionTimes[sessionTimes.length-1].ao5}`;
+        document.getElementById("average").innerText = `average : ${ao(sessionTimes.length, sessionTimes.length)}`;
+        document.getElementById("ao12").innerText = ` current ao12 : ${sessionTimes[sessionTimes.length-1].ao12}`;
+    }
 
-    document.getElementById("pb").innerText = `session best single : ${pb()}`
+    document.getElementById("pb").innerText = `session best single : ${pb()}`;
+    
 }
 
 function exportTimes(startIndex, endIndex) {
@@ -284,13 +288,22 @@ function exportTimes(startIndex, endIndex) {
     return exportstr;
 }
 
-//add selection option for the current session
-for(let i = 1; i<=times.length; i++) {
-    let temp = create(`<option value=\"${i}\">${i}</option>`);
-    sessionSelect.appendChild(temp);
-}
-sessionSelect.value = times.length.toString();
+function deleteSession(index) {
+    localStorage.setItem("times", JSON.stringify(times.splice(index-1, 1)));
+    updateSessions();
+    updateTimes();
+} 
 
+function updateSessions() {
+    //add selection option for the current session
+    document.getElementById("sessionSelect").innerHTML = '<option id="newSession">new session</option>';
+    for(let i = 1; i<=times.length; i++) {
+        let temp = create(`<option value=\"${i}\">${i}</option>`);
+        sessionSelect.appendChild(temp);
+    }
+    sessionSelect.value = times.length.toString();
+}
+updateSessions();
 updateTimes()
 
 if(localStorage.getItem("inputMethod")==='manual') {
