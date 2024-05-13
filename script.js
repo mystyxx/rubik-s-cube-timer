@@ -35,6 +35,7 @@ class solve {
     constructor(time, scramble) {
         this.time = time;
         this.scramble = scramble;
+        console.log(times[parseInt(sessionSelect.value)-1].length)
         this.ao5 = ao(5, times[parseInt(sessionSelect.value)-1].length);
         this.ao12 = ao(12, times[parseInt(sessionSelect.value)-1].length);
         this.ao50 = ao(50, times[parseInt(sessionSelect.value)-1].length);
@@ -153,7 +154,7 @@ function ao(x, index) {
     const sessionTimes = times[sessionIndex];
 
     // check there are at leat x times
-    if (index < x || index > sessionTimes.length) {
+    if (index < x-1 || index > sessionTimes.length) {
         return "--";
     }
 
@@ -183,10 +184,10 @@ function ao(x, index) {
 }
 
 
-function pb() {
+function pb(startIndex, endIndex) {
     let sessionTimes = times[parseInt(sessionSelect.value) - 1];
     let pb = sessionTimes[0].time;
-    for(let i= sessionTimes.length-1; i>=0; i--) {
+    for(let i= endIndex; i>=startIndex; i--) {
         if(pb>parseFloat(sessionTimes[i].time)) {
             pb = parseFloat(sessionTimes[i].time);
         }
@@ -194,12 +195,10 @@ function pb() {
     return(pb);
 }
 
-function pbao(x) {
-    let sessionTimes = times[parseInt(sessionSelect.value) - 1];
-    let pb = ao(x, x)
+function pbao(x, startIndex, endIndex) {
+    let pb = ao(x, endIndex)
 
-    for(let i = x; i<sessionTimes.length+1; i++) {
-        console.log(i)
+    for(let i = startIndex; i<endIndex; i++) {
         if(pb>ao(x, i)) {
             pb = ao(x, i);
         }
@@ -234,7 +233,6 @@ function deleteTime(i) {
 }
 
 function updateTimes() {
-    if(times[parseInt(sessionSelect.value)-1][0] == undefined) {return;}
     localStorage.setItem("times", JSON.stringify(times));
     const timeList = document.getElementById("timeList");
     timeList.innerHTML = ""; // erase timelist entierly
@@ -247,8 +245,8 @@ function updateTimes() {
         const timeDiv = document.createElement('tr');
         timeDiv.innerHTML = `
             <td class="timeGrid" onclick='deleteTime(${i})'>${i + 1}.</td>
-            <td class="timeGrid" onclick='alert(exportTimes(${i}, ${i}, true))'>${time}</td>
-            <td class="timeGrid">${sessionTimes[i].ao5}</td>`;
+            <td class="timeGrid" onclick='alert(exportTimes(${i}, ${i}))'>${time}</td>
+            <td class="timeGrid" onclick='alert(exportTimes(${i-4}, ${i}))'>${sessionTimes[i].ao5}</td>`;
         timeList.appendChild(timeDiv);
 
     }
@@ -260,23 +258,24 @@ function updateTimes() {
     document.getElementById("pb").innerText = `session best single : ${pb()}`
 }
 
-function exportTimes(startIndex, endIndex, single) {
+function exportTimes(startIndex, endIndex) {
     let exportstr = '';
-    if(!single) {exportstr = `meilleur single : ${pb()}\n`;}
     timenb = endIndex-startIndex;
+    if(timenb>=0) {exportstr = `meilleur single : ${pb(startIndex, endIndex)}\n`;}
 
-    if(timenb >= 5) {exportstr += `moyenne élaguée sur 5 :
+    if(timenb >= 4) {exportstr += `moyenne élaguée sur 5 :
     en cours : ${ao(5, times[parseInt(sessionSelect.value)-1].length)}
-    meilleure : ${pbao(5)}\n`}
+    meilleure : ${pbao(5, startIndex, endIndex)}\n`}
 
     if(timenb >=12) {exportstr += `moyenne élaguée sur 12 :
     en cours : ${ao(12, times[parseInt(sessionSelect.value)-1].length)}
-    meilleure : ${pbao(12)}\n`}
+    meilleure : ${pbao(12, startIndex, endIndex)}\n`}
 
     if(timenb >= 100) {exportstr+=`moyenne élaguée sur 100 :
     en cours :${ao(100, times[parseInt(sessionSelect.value)-1].length)}
-    meilleure : ${pbao(100)}\n`}
+    meilleure : ${pbao(100, startIndex, endIndex)}\n`}
 
+    exportstr+='\n';
     for(let i = startIndex; i<=endIndex; i++) {
         exportstr += `${i+1}.(${times[parseInt(sessionSelect.value)-1][i].time}) ${times[parseInt(sessionSelect.value)-1][i].scramble}\n`;
     }

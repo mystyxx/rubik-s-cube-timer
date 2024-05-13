@@ -14,8 +14,8 @@
     <h1 id="currentTime">0.00</h1>
     <input id="manualInput" type="text" onkeypress="submitTime(event)">
 
-    <h2 id="ao5"></h2>
-    <h2 id="ao12"></h2>
+    <h2 id="ao5" onclick="alert(exportTimes(times[parseInt(sessionSelect.value)-1].length-5, times[parseInt(sessionSelect.value)-1].length-1))"></h2>
+    <h2 id="ao12" onclick="alert(exportTimes(times[parseInt(sessionSelect.value)-1].length-12, times[parseInt(sessionSelect.value)-1].length-1))"></h2>
     
     <div id="sideBar">
         <h2>session</h2>
