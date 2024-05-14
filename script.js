@@ -33,14 +33,13 @@ if(!localStorage.getItem("inputMethod")) {
 
 class solve {
     constructor(time, scramble) {
-        this.time = time;
+        this.time = secondsToMinutesAndSeconds((Math.round(splitSeconds(time) * 100) / 100).toFixed(2));
         this.scramble = scramble;
-        console.log(times[parseInt(sessionSelect.value)-1].length)
-        this.ao5 = ao(5, times[parseInt(sessionSelect.value)-1].length);
-        this.ao12 = ao(12, times[parseInt(sessionSelect.value)-1].length);
-        this.ao50 = ao(50, times[parseInt(sessionSelect.value)-1].length);
-        this.ao100 = ao(100, times[parseInt(sessionSelect.value)-1].length);
-        this.ao1000 = ao(1000, times[parseInt(sessionSelect.value)-1].length);
+        this.ao5 = secondsToMinutesAndSeconds(Math.round((Math.round(ao(5, times[parseInt(sessionSelect.value)-1].length) * 100) / 100)).toFixed(2));
+        this.ao12 = secondsToMinutesAndSeconds(Math.round(Math.round(ao(12, times[parseInt(sessionSelect.value)-1].length) * 100) / 100).toFixed(2));
+        this.ao50 = secondsToMinutesAndSeconds(Math.round(Math.round(ao(50, times[parseInt(sessionSelect.value)-1].length) * 100) / 100).toFixed(2));
+        this.ao100 = secondsToMinutesAndSeconds(Math.round(Math.round(ao(100, times[parseInt(sessionSelect.value)-1].length) * 100) / 100).toFixed(2));
+        this.ao1000 = secondsToMinutesAndSeconds(Math.round(Math.round(ao(1000, times[parseInt(sessionSelect.value)-1].length) * 100) / 100).toFixed(2));
     }
 }
 
@@ -72,6 +71,61 @@ function create(htmlStr) {
         frag.appendChild(temp.firstChild);
     }
     return frag;
+}
+
+function splitSeconds(input) {
+    if (typeof input !== 'string') {
+        throw new Error('Input must be a string.');
+    }
+
+    if(input == '--') {return '--'}
+
+    // Regular expression patterns to match different formats
+    const minutesSecondsPattern = /^(\d+):(\d{1,2})$/;
+    const secondsCentisecondsPattern = /^(\d+)\.(\d{1,2})$/;
+    const secondsPattern = /^\d+$/;
+    const centisecondsOnlyPattern = /^\d{3}$/;
+
+    if (minutesSecondsPattern.test(input)) {
+        // Format: m:ss
+        const [minutes, seconds] = input.split(':');
+        const totalSeconds = parseInt(minutes, 10) * 60 + parseInt(seconds, 10);
+        if (parseInt(seconds, 10) >= 60) {
+            throw new Error('Seconds must be less than 60 in the m:ss format.');
+        }
+        return totalSeconds;
+    } else if (secondsCentisecondsPattern.test(input)) {
+        // Format: s.centièmes (seconds and centiseconds)
+        const [seconds, centiseconds] = input.split('.');
+        const totalSeconds = parseInt(seconds, 10) + parseInt(centiseconds, 10) / 100;
+        if (parseInt(seconds, 10) >= 60) {
+            throw new Error('Seconds must be less than 60 in the s.centiseconds format.');
+        }
+        return totalSeconds;
+    } else if (secondsPattern.test(input)) {
+        // Format: seconds (simple seconds)
+        const totalSeconds = parseInt(input, 10);
+        if (totalSeconds >= 60) {
+            const totalSeconds = parseInt(input, 10) / 100;
+            return totalSeconds;
+        }
+        return totalSeconds;
+    } else if (centisecondsOnlyPattern.test(input)) {
+        // Format: centiseconds only (e.g., "564" for 5.64 seconds)
+        const totalSeconds = parseInt(input, 10) / 100;
+        return totalSeconds;
+    } else {
+        throw new Error('Unsupported time format.');
+    }
+}
+
+function secondsToMinutesAndSeconds(input) {
+    if(isNaN(input)) {return '--'}
+
+    if(input>60) {
+        return `${parseInt(input/60)}:${input%60}`;
+    }
+    else {return input}
 }
 
 function switchInputMethod() {
@@ -145,7 +199,9 @@ function oppositeSide(side) {
 
 function timer() {
     let ms = parseFloat(document.getElementById("currentTime").innerText) + 0.01;
-    document.getElementById("currentTime").innerText = Math.round(ms * 100) / 100;
+    if(ms>6000) {document.getElementById("currentTime").innerText = parseInt(ms/60) + ':' + ((Math.round(ms * 100) / 100)%60).toFixed(2);}
+    else {document.getElementById("currentTime").innerText = ((Math.round(ms * 100) / 100)%60).toFixed(2);}
+    
 }
 
 function ao(x, index) {
@@ -165,7 +221,7 @@ function ao(x, index) {
     let minTime = -Infinity;
     let maxTime = Infinity;
     for(let i = startIndex; i<=endIndex; i++) {
-        let currentTime = parseFloat(sessionTimes[i].time);
+        let currentTime = splitSeconds(sessionTimes[i].time);
         if (currentTime < minTime) {
             minTime = currentTime;
         }
@@ -175,8 +231,8 @@ function ao(x, index) {
     }
 
     for (let i = endIndex; i >= startIndex; i--) {
-        if(parseFloat(sessionTimes[i].time)!==maxTime && parseFloat(sessionTimes[i].time)!==minTime) {
-            s += parseFloat(sessionTimes[i].time);
+        if(splitSeconds(sessionTimes[i].time)!==maxTime && splitSeconds(sessionTimes[i].time)!==minTime) {
+            s += splitSeconds(sessionTimes[i].time);
         }
     }
 
@@ -186,10 +242,10 @@ function ao(x, index) {
 
 function pb(startIndex, endIndex) {
     let sessionTimes = times[parseInt(sessionSelect.value) - 1];
-    let pb = sessionTimes[0].time;
+    let pb = splitSeconds(sessionTimes[0].time);
     for(let i= endIndex; i>=startIndex; i--) {
-        if(pb>parseFloat(sessionTimes[i].time)) {
-            pb = parseFloat(sessionTimes[i].time);
+        if(pb>splitSeconds(sessionTimes[i].time)) {
+            pb = splitSeconds(sessionTimes[i].time);
         }
     }
     return(pb);
@@ -213,12 +269,12 @@ function submitTime(event) {
         }
     }
     else {
-        times[sessionSelect.options[sessionSelect.selectedIndex].value-1].push(new solve(parseFloat(document.getElementById("currentTime").innerText), document.getElementById("scramble").innerText));
+        times[sessionSelect.options[sessionSelect.selectedIndex].value-1].push(new solve(document.getElementById("currentTime").innerText, document.getElementById("scramble").innerText));
     }
     // add current times to global times list
 
     if(!isNaN(parseFloat(document.getElementById("manualInput").value))) {
-        times[sessionSelect.options[sessionSelect.selectedIndex].value-1].push(new solve(Math.abs(document.getElementById("manualInput").value), document.getElementById("scramble").innerText));
+        times[sessionSelect.options[sessionSelect.selectedIndex].value-1].push(new solve(document.getElementById("manualInput").value, document.getElementById("scramble").innerText));
         document.getElementById("scramble").innerText = scramble(20);
     }
     document.getElementById("manualInput").value = '';
