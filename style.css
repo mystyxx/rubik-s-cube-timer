@@ -2,6 +2,8 @@ html, body {
     margin: 0;
     height: 100%;
     overflow: hidden;
+    font-family:monospace;
+    font-size: large;
 }
 #topBar {
     text-align: center;
@@ -24,7 +26,7 @@ html, body {
 }
 
 #ao5, #ao12 {
-    /* padding:2%; */
+    padding-top: 1%;
     text-align: center;
     margin: 0 auto;
 }
@@ -33,7 +35,7 @@ html, body {
     left:0;
     padding-left: 10px;
     padding-right: 10px;
-    width:fit-content;
+    width:10%;
     background-color: aliceblue;
     height:max-content;
     top: 20%;
@@ -42,14 +44,22 @@ html, body {
 }
 
 #timeList {
-    row-gap: 20px;
     display: block;
+    width: 100%;
 }
 
 td {
     padding: 10px;
     text-align: center;
+    /* width: 33%; */
 }
+td:hover {
+    background-color: gainsboro;
+}
+/* 
+tr {
+    width: 100%;
+} */
 
 #timeList, th, td {
     border: 1px solid black;
@@ -65,4 +75,5 @@ td {
 .scroll {
     max-height: 55vh;
     overflow-y: scroll;
+    width: 100%;
 }

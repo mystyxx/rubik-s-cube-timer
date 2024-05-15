@@ -11,6 +11,7 @@ RUBIK'S CUBE TIMER BY MYSTYXX*/
 // get back data from localStorage or init an empty array if empty or invalid
 let timesStr = localStorage.getItem("times");
 let times = [[]];
+let ms = 0;
 
 if (timesStr) {
     try {
@@ -35,12 +36,16 @@ class solve {
     constructor(time, scramble) {
         this.time = secondsToMinutesAndSeconds((Math.round(splitSeconds(time) * 100) / 100).toFixed(2));
         this.scramble = scramble;
-        this.ao5 = secondsToMinutesAndSeconds(Math.round((Math.round(ao(5, times[parseInt(sessionSelect.value)-1].length) * 100) / 100)).toFixed(2));
-        this.ao12 = secondsToMinutesAndSeconds(Math.round(Math.round(ao(12, times[parseInt(sessionSelect.value)-1].length) * 100) / 100).toFixed(2));
-        this.ao50 = secondsToMinutesAndSeconds(Math.round(Math.round(ao(50, times[parseInt(sessionSelect.value)-1].length) * 100) / 100).toFixed(2));
-        this.ao100 = secondsToMinutesAndSeconds(Math.round(Math.round(ao(100, times[parseInt(sessionSelect.value)-1].length) * 100) / 100).toFixed(2));
-        this.ao1000 = secondsToMinutesAndSeconds(Math.round(Math.round(ao(1000, times[parseInt(sessionSelect.value)-1].length) * 100) / 100).toFixed(2));
+        this.ao5 = ao(5, times[sessionSelect.value-1].length);
+        this.ao12 = ao(12, times[sessionSelect.value-1].length);
+        this.ao50 = ao(50, times[sessionSelect.value-1].length);
+        this.ao100 = ao(100, times[sessionSelect.value-1].length);
+        this.ao1000 = ao(1000, times[sessionSelect.value-1].length);
     }
+}
+
+function pad2(number) {
+    return (number < 10 ? '0' : '') + number
 }
 
 function quicksort(liste) {
@@ -78,41 +83,49 @@ function splitSeconds(input) {
         throw new Error('Input must be a string.');
     }
 
-    if(input == '--') {return '--'}
-
     // Regular expression patterns to match different formats
+    const minutesSecondsCentisecondsPattern = /^(\d+):(\d{1,2})\.(\d{1,2})$/;
     const minutesSecondsPattern = /^(\d+):(\d{1,2})$/;
     const secondsCentisecondsPattern = /^(\d+)\.(\d{1,2})$/;
     const secondsPattern = /^\d+$/;
     const centisecondsOnlyPattern = /^\d{3}$/;
 
-    if (minutesSecondsPattern.test(input)) {
-        // Format: m:ss
+    if (minutesSecondsCentisecondsPattern.test(input)) {
+        // Format: m:ss.cs (minutes, seconds, centiseconds)
+        const [minutes, seconds, centiseconds] = input.split(/:|\./);
+        const totalSeconds = parseInt(minutes, 10) * 60 + parseInt(seconds, 10) + parseInt(centiseconds, 10) / 100;
+        
+        if (parseInt(seconds, 10) >= 60 || parseInt(centiseconds, 10) >= 100) {
+            throw new Error('Invalid minutes:seconds.centiseconds format.');
+        }
+
+        return totalSeconds;
+    } else if (minutesSecondsPattern.test(input)) {
+        // Format: m:ss (minutes, seconds)
         const [minutes, seconds] = input.split(':');
         const totalSeconds = parseInt(minutes, 10) * 60 + parseInt(seconds, 10);
+        
         if (parseInt(seconds, 10) >= 60) {
             throw new Error('Seconds must be less than 60 in the m:ss format.');
         }
+
         return totalSeconds;
     } else if (secondsCentisecondsPattern.test(input)) {
-        // Format: s.centièmes (seconds and centiseconds)
+        // Format: s.cs (seconds, centiseconds)
         const [seconds, centiseconds] = input.split('.');
         const totalSeconds = parseInt(seconds, 10) + parseInt(centiseconds, 10) / 100;
-        if (parseInt(seconds, 10) >= 60) {
-            throw new Error('Seconds must be less than 60 in the s.centiseconds format.');
-        }
+
+
         return totalSeconds;
     } else if (secondsPattern.test(input)) {
         // Format: seconds (simple seconds)
         const totalSeconds = parseInt(input, 10);
-        if (totalSeconds >= 60) {
-            const totalSeconds = parseInt(input, 10) / 100;
-            return totalSeconds;
-        }
+
         return totalSeconds;
     } else if (centisecondsOnlyPattern.test(input)) {
         // Format: centiseconds only (e.g., "564" for 5.64 seconds)
         const totalSeconds = parseInt(input, 10) / 100;
+
         return totalSeconds;
     } else {
         throw new Error('Unsupported time format.');
@@ -123,9 +136,9 @@ function secondsToMinutesAndSeconds(input) {
     if(isNaN(input)) {return '--'}
 
     if(input>60) {
-        return `${parseInt(input/60)}:${input%60}`;
+        return `${parseInt(input/60)}:${pad2((input%60).toFixed(2))}`;
     }
-    else {return input}
+    else {return parseFloat(input).toFixed(2)}
 }
 
 function switchInputMethod() {
@@ -198,9 +211,10 @@ function oppositeSide(side) {
 }
 
 function timer() {
-    let ms = parseFloat(document.getElementById("currentTime").innerText) + 0.01;
-    if(ms>6000) {document.getElementById("currentTime").innerText = parseInt(ms/60) + ':' + ((Math.round(ms * 100) / 100)%60).toFixed(2);}
-    else {document.getElementById("currentTime").innerText = ((Math.round(ms * 100) / 100)%60).toFixed(2);}
+    ms+=0.01;
+    // document.getElementById("currentTime").innerText = ms;
+    if(ms>60) {document.getElementById("currentTime").innerText = secondsToMinutesAndSeconds((Math.round(splitSeconds(ms.toFixed(2)) * 100) / 100).toFixed(2));}
+    else {document.getElementById("currentTime").innerText = ((Math.round(ms * 100) / 100)).toFixed(2);}
     
 }
 
@@ -236,16 +250,15 @@ function ao(x, index) {
         }
     }
 
-    return secondsToMinutesAndSeconds(Math.round(Math.round(s / Math.min(x, endIndex - startIndex + 1)) * 100) / 100);
+    return secondsToMinutesAndSeconds(Math.round(Math.round(s / Math.min(x, endIndex - startIndex + 1))));
 }
-
 
 function pb(startIndex, endIndex) {
     let sessionTimes = times[parseInt(sessionSelect.value) - 1];
-    let pb = splitSeconds(sessionTimes[0].time);
+    let pb = sessionTimes[0].time;
     for(let i= endIndex; i>=startIndex; i--) {
-        if(pb>splitSeconds(sessionTimes[i].time)) {
-            pb = splitSeconds(sessionTimes[i].time);
+        if(splitSeconds(pb)>splitSeconds(sessionTimes[i].time)) {
+            pb = sessionTimes[i].time;
         }
     }
     return secondsToMinutesAndSeconds(pb);
@@ -255,7 +268,7 @@ function pbao(x, startIndex, endIndex) {
     let pb = ao(x, endIndex)
 
     for(let i = startIndex; i<endIndex; i++) {
-        if(pb>ao(x, i)) {
+        if(splitSeconds(pb)>ao(x, i)) {
             pb = ao(x, i);
         }
     }
@@ -269,7 +282,7 @@ function submitTime(event) {
         }
     }
     else {
-        times[sessionSelect.options[sessionSelect.selectedIndex].value-1].push(new solve(document.getElementById("currentTime").innerText, document.getElementById("scramble").innerText));
+        times[sessionSelect.options[sessionSelect.selectedIndex].value-1].push(new solve(ms.toFixed(2), document.getElementById("scramble").innerText));
     }
     // add current times to global times list
 
@@ -313,7 +326,7 @@ function updateTimes() {
         document.getElementById("ao12").innerText = ` current ao12 : ${sessionTimes[sessionTimes.length-1].ao12}`;
     }
 
-    document.getElementById("pb").innerText = `session best single : ${pb()}`;
+    document.getElementById("pb").innerText = `session best single : ${pb(0, sessionTimes.length-1)}`;
     
 }
 
@@ -413,6 +426,7 @@ addEventListener("keyup", (timerStart) => {
                 document.getElementById("currentTime").innerText = '0';
                 testIsReady = false;
                 testIsRunning = true;
+                ms = 0
                 timerIntervalId = setInterval(timer, 10);
             }
         }
