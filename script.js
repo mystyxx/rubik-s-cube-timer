@@ -88,7 +88,7 @@ function splitSeconds(input) {
     const minutesSecondsPattern = /^(\d+):(\d{1,2})$/;
     const secondsCentisecondsPattern = /^(\d+)\.(\d{1,2})$/;
     const secondsPattern = /^\d+$/;
-    const centisecondsOnlyPattern = /^\d{3}$/;
+    const centisecondsOnlyPattern = /^\d{3,4}$/;
 
     if (minutesSecondsCentisecondsPattern.test(input)) {
         // Format: m:ss.cs (minutes, seconds, centiseconds)
@@ -117,14 +117,14 @@ function splitSeconds(input) {
 
 
         return totalSeconds;
-    } else if (secondsPattern.test(input)) {
-        // Format: seconds (simple seconds)
-        const totalSeconds = parseInt(input, 10);
-
-        return totalSeconds;
     } else if (centisecondsOnlyPattern.test(input)) {
         // Format: centiseconds only (e.g., "564" for 5.64 seconds)
         const totalSeconds = parseInt(input, 10) / 100;
+
+        return totalSeconds;
+    } else if (secondsPattern.test(input)) {
+        // Format: seconds (simple seconds)
+        const totalSeconds = parseInt(input, 10);
 
         return totalSeconds;
     } else {
@@ -250,7 +250,7 @@ function ao(x, index) {
         }
     }
 
-    return secondsToMinutesAndSeconds(Math.round(Math.round(s / Math.min(x, endIndex - startIndex + 1))));
+    return secondsToMinutesAndSeconds((s / Math.min(x, endIndex - startIndex + 1)));
 }
 
 function pb(startIndex, endIndex) {
@@ -339,17 +339,17 @@ function exportTimes(startIndex, endIndex) {
     en cours : ${ao(5, times[parseInt(sessionSelect.value)-1].length)}
     meilleure : ${pbao(5, startIndex, endIndex)}\n`}
 
-    if(timenb >=12) {exportstr += `moyenne élaguée sur 12 :
-    en cours : ${ao(12, times[parseInt(sessionSelect.value)-1].length)}
+    if(timenb >=11) {exportstr += `moyenne élaguée sur 12 :
+    en cours : ${times[sessionSelect.value-1][times[sessionSelect.value-1].length-1].ao12}
     meilleure : ${pbao(12, startIndex, endIndex)}\n`}
 
-    if(timenb >= 100) {exportstr+=`moyenne élaguée sur 100 :
+    if(timenb >= 99) {exportstr+=`moyenne élaguée sur 100 :
     en cours :${ao(100, times[parseInt(sessionSelect.value)-1].length)}
     meilleure : ${pbao(100, startIndex, endIndex)}\n`}
 
     exportstr+='\n';
     for(let i = startIndex; i<=endIndex; i++) {
-        exportstr += `${i+1}.(${times[parseInt(sessionSelect.value)-1][i].time}) ${times[parseInt(sessionSelect.value)-1][i].scramble}\n`;
+        exportstr += `${i+1}. ${times[parseInt(sessionSelect.value)-1][i].time}   ${times[parseInt(sessionSelect.value)-1][i].scramble}\n`;
     }
 
 
