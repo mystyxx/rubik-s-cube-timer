@@ -141,16 +141,15 @@ function secondsToMinutesAndSeconds(input) {
     else {return parseFloat(input).toFixed(2)}
 }
 
-function switchInputMethod() {
-    let inputMethod = localStorage.getItem("inputMethod");
-    console.log(inputMethod)
-    if(inputMethod === "manual") {
-        localStorage.setItem("inputMethod", "automatic");
+function switchInputMethod(methodToSwitchTo) {
+    document.getElementById("manualInput").value = '';
+    if(methodToSwitchTo === "automatic") {
+        document.getElementById("switchInputMethod").onclick = function() { switchInputMethod('manual'); localStorage.setItem("inputMethod", "manual")};
         document.getElementById("manualInput").style.display = 'none';
         document.getElementById("currentTime").style.display = 'block';
     }
-    if(inputMethod === 'automatic') {
-        localStorage.setItem("inputMethod", "manual");
+    if(methodToSwitchTo === 'manual') {
+        document.getElementById("switchInputMethod").onclick = function() { switchInputMethod('automatic'); localStorage.setItem("inputMethod", "automatic") };
         document.getElementById("manualInput").style.display = 'block';
         document.getElementById("currentTime").style.display = 'none';
     }
@@ -374,15 +373,7 @@ function updateSessions() {
 updateSessions();
 updateTimes()
 
-if(localStorage.getItem("inputMethod")==='manual') {
-    document.getElementById("manualInput").style.display = 'block';
-    document.getElementById("currentTime").style.display = 'none';
-}
-else {
-    document.getElementById("manualInput").style.display = 'none';
-    document.getElementById("currentTime").style.display = 'block';
-}
-
+switchInputMethod(localStorage.getItem("inputMethod"));
 
 document.getElementById("sessionSelect").addEventListener("change", (createNewSession) => {
     if (createNewSession.target.value === "new session") {
