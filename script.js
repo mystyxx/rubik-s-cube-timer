@@ -26,7 +26,7 @@ let testIsReady = false;
 let testIsRunning = false;
 let timerIntervalId;
 let sessionSelect = document.getElementById("sessionSelect");   
-document.getElementById("scramble").innerText = scramble(20);
+document.getElementById("scramble").innerText = scramble(document.getElementById("eventSelect").value);
 
 if(!localStorage.getItem("inputMethod")) {
     localStorage.setItem("inputMethod", "automatic")
@@ -155,7 +155,13 @@ function switchInputMethod(methodToSwitchTo) {
     }
 }
 
-function scramble(length) {
+function scramble(size) {
+    switch(size) {
+        case '3x3x3':
+            length = 20;
+        default:
+            length=20;
+    }
     const moves = ['F', 'B', 'R', 'L', 'U', 'D']; // Rubik's cube sides
     const turns = ['', "'", '2']; // types of rotation
 
@@ -185,6 +191,33 @@ function scramble(length) {
         }
 
         lastSide = side; // update last side
+    }
+
+    if(size==='4x4x4') {
+        const wideMoves = ['F', 'B', 'R', 'L', 'U', 'D', 'Fw', 'Bw', 'Rw', 'Lw', 'Uw', 'Dw'];
+        for (let i = 0; i < length; i++) {  
+            let side;
+            do {
+                side = wideMoves[Math.floor(Math.random() * wideMoves.length)]; // randomly picking a side
+            } while (side === lastSide || // Check if the new side is the same as the last side
+            side === oppositeSide(lastSide) || // Check if the new side is opposite to the last side
+            (lastOppositeCount >= 2 && side === wideMoves[Math.floor(Math.random() * moves.length)]) // Avoid repeating opposite sides too many times
+            ); // check if the last side was picked last time
+    
+            const turn = wideMoves[Math.floor(Math.random() * wideMoves.length)]; // randomly picking the rotation
+            const move = side + turn; // combining side and rotation
+    
+            sequence.push(move);
+    
+            // Update last opposite count
+            if (side === oppositeSide(lastSide)) {
+                lastOppositeCount++;
+            } else {
+                lastOppositeCount = 0;
+            }
+    
+            lastSide = side; // update last side
+        }
     }
 
     return sequence.join(' ');
@@ -287,7 +320,7 @@ function submitTime(event) {
 
     if(!isNaN(parseFloat(document.getElementById("manualInput").value))) {
         times[sessionSelect.options[sessionSelect.selectedIndex].value-1].push(new solve(document.getElementById("manualInput").value, document.getElementById("scramble").innerText));
-        document.getElementById("scramble").innerText = scramble(20);
+        document.getElementById("scramble").innerText = scramble(document.getElementById("eventSelect").value);
     }
     document.getElementById("manualInput").value = '';
     updateTimes()
@@ -384,6 +417,10 @@ document.getElementById("sessionSelect").addEventListener("change", (createNewSe
     }
     updateTimes()
 });
+
+document.getElementById("eventSelect").addEventListener("change", (updateScramble) => {
+    document.getElementById("scramble").innerText = scramble(document.getElementById("eventSelect").value);
+})
 
 addEventListener("keydown", (timerReady) => {
     if (timerReady.keyCode == 32) {

@@ -8,6 +8,7 @@ html, body {
 #topBar {
     text-align: center;
     background-color: aliceblue;
+    padding: 0 100px;
 }
 
 #manualInput {
@@ -46,6 +47,10 @@ html, body {
 #timeList {
     display: block;
     width: 100%;
+}
+
+#eventSelect {
+    margin-top: 5px;
 }
 
 td {
