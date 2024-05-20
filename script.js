@@ -159,6 +159,10 @@ function scramble(size) {
     switch(size) {
         case '3x3x3':
             length = 20;
+            break;
+        case '2x2x2':
+            length = 9;
+            break;
         default:
             length=20;
     }
@@ -204,7 +208,7 @@ function scramble(size) {
             (lastOppositeCount >= 2 && side === wideMoves[Math.floor(Math.random() * moves.length)]) // Avoid repeating opposite sides too many times
             ); // check if the last side was picked last time
     
-            const turn = wideMoves[Math.floor(Math.random() * wideMoves.length)]; // randomly picking the rotation
+            const turn = turns[Math.floor(Math.random() * turns.length)]; // randomly picking the rotation
             const move = side + turn; // combining side and rotation
     
             sequence.push(move);
