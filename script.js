@@ -31,6 +31,9 @@ document.getElementById("scramble").innerText = scramble(document.getElementById
 if(!localStorage.getItem("inputMethod")) {
     localStorage.setItem("inputMethod", "automatic")
 }
+if(!localStorage.getItem("currentPuzzle")) {
+    localStorage.setItem("currentPuzzle", "3x3x3")
+}
 
 class solve {
     constructor(time, scramble) {
@@ -411,6 +414,7 @@ updateSessions();
 updateTimes()
 
 switchInputMethod(localStorage.getItem("inputMethod"));
+document.getElementById("eventSelect").value = localStorage.getItem("currentPuzzle");
 
 document.getElementById("sessionSelect").addEventListener("change", (createNewSession) => {
     if (createNewSession.target.value === "new session") {
@@ -424,6 +428,7 @@ document.getElementById("sessionSelect").addEventListener("change", (createNewSe
 
 document.getElementById("eventSelect").addEventListener("change", (updateScramble) => {
     document.getElementById("scramble").innerText = scramble(document.getElementById("eventSelect").value);
+    localStorage.setItem("currentPuzzle", document.getElementById("eventSelect").value);
 })
 
 addEventListener("keydown", (timerReady) => {
